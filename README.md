@@ -47,7 +47,7 @@ time) (or 6T + 6T).
 STROBE (20T) - SYNC (10T) - PAYLOAD (10T) - DATA (10T for each word) - LEADOUT (10T) - raw encoding
 STROBE (24T) - SYNC (12T) - PAYLOAD (12T) - DATA (12T for each word) - LEADOUT (12T) - 4b5b encoding
 
-## Protocol design considerations
+## Protocol design
 
 - Data rate is low (1000bps) and depends on the interrupt frequency. Max
 rate for these simple radios is around 5000bps. Tested with 100bps
@@ -84,7 +84,7 @@ addition of a 4 byte header (destination and source address) and a 2
 access to frames and another for packets with address, CRC and a
 maximum of 32 bytes of user payload.
 
-## 4b/5b coding:
+## 4b/5b coding
 
 - Not perfectly DC balanced, but works well.
 - Requires only a 16 entry encode table and a 32 entry decode table
@@ -115,7 +115,7 @@ data stream (maximum of 3 bits).
 | 1110		| 11001		|
 | 1111		| 11010		|
 
-## Radio modules considerations:
+## Radio modules considerations
 
 RX:
 These simple RX modules are very sensitive to the supply voltage, so
@@ -138,13 +138,13 @@ the module.
 
 ## API
 
-### Radio setup and direct frame TX and RX:
+### Radio setup and direct frame TX and RX
 
 - int radio433_setup(struct radio_data_s *radio, uint16_t baud, uint8_t direction);
 - int radio433_tx(struct radio_data_s *radio, uint8_t *data, uint8_t payload);
 - int radio433_rx(struct radio_data_s *radio, uint8_t *data, uint8_t *payload);
 
-### Packet send and receive:
+### Packet send and receive
 
 - void radio433_addr(struct radio_data_s *radio, uint16_t address);
 - int radio433_send(struct radio_data_s *radio, uint16_t dst_addr, uint8_t *data, uint8_t payload);
