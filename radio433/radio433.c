@@ -31,7 +31,11 @@ const uint8_t decode4b5b[] = {
 
 volatile struct radio_data_s *radioptr;
 
+#ifndef ATMEGA8
 ISR(TIMER2_COMPA_vect){
+#else
+ISR(TIMER2_COMP_vect){
+#endif
 	uint8_t byte;
 	static uint16_t rfdata;
 	
@@ -178,7 +182,11 @@ ISR(TIMER2_COMPA_vect){
 			if (radioptr->tbit == TBYTE - 1) {
 				while (RX_PORT & (1 << RX_PIN));
 				radioptr->tbit--;
+#ifndef ATMEGA8
 				TCNT2 = OCR2A >> 3;
+#else
+				TCNT2 = OCR2 >> 3;
+#endif
 				break;
 			}
 		
@@ -216,7 +224,11 @@ ISR(TIMER2_COMPA_vect){
 			if (radioptr->tbit == TBYTE - 1) {
 				while (RX_PORT & (1 << RX_PIN));
 				radioptr->tbit--;
+#ifndef ATMEGA8
 				TCNT2 = OCR2A >> 3;
+#else
+				TCNT2 = OCR2 >> 3;
+#endif
 				break;
 			}
 			
@@ -250,7 +262,11 @@ ISR(TIMER2_COMPA_vect){
 			if (radioptr->tbit == TBYTE - 1) {
 				while (RX_PORT & (1 << RX_PIN));
 				radioptr->tbit--;
+#ifndef ATMEGA8
 				TCNT2 = OCR2A >> 3;
+#else
+				TCNT2 = OCR2 >> 3;
+#endif
 				break;
 			}
 			
@@ -289,13 +305,22 @@ int radio433_setup(struct radio_data_s *radio, uint16_t baud, uint8_t direction)
 	
 	/* clear timer2 registers */
 	TCNT2 = 0;
+#ifndef ATMEGA8
 	TCCR2A = 0;
 	TCCR2B = 0;
+#else
+	TCCR2 = 0;
+#endif
 
 	/* turn on CTC mode, timer2
 	 * clear on compare and match */
+#ifndef ATMEGA8
 	TCCR2A |= (1 << WGM21);
+#else
+	TCCR2 |= (1 << WGM21);
+#endif
 	
+#ifndef ATMEGA8
 	if (baud >= 1000) {
 		OCR2A = ((F_CPU / 64) / baud) - 1;
 		TCCR2B |= (1 << CS22);					/* clk / 64 (prescaler) */
@@ -309,6 +334,22 @@ int radio433_setup(struct radio_data_s *radio, uint16_t baud, uint8_t direction)
 	
 	/* enable timer2 interrupts */
 	TIMSK2 |= (1 << OCIE2A);
+#else
+	if (baud >= 1000) {
+		OCR2 = ((F_CPU / 64) / baud) - 1;
+		TCCR2 |= (1 << CS22);					/* clk / 64 (prescaler) */
+	} else if (baud >= 250) {
+		OCR2 = ((F_CPU / 256) / baud) - 1;
+		TCCR2 |= (1 << CS22) | (1 << CS21);			/* clk / 256 (prescaler) */
+	} else {
+		OCR2 = ((F_CPU / 1024) / baud) - 1;
+		TCCR2 |= (1 << CS22) | (1 << CS21) | (1 << CS20);	/* clk / 1024 (prescaler) */
+	}
+	
+	/* enable timer2 interrupts */
+	TIMSK |= (1 << OCIE2);
+#endif
+	
 
 	/* initialize radio data structure */
 	radio->payload = 0;
@@ -338,12 +379,20 @@ int radio433_tx(struct radio_data_s *radio, uint8_t *data, uint8_t payload)
 		payload = MAX_FRAME_SIZE;
 
 	/* copy data from user buffer atomically and start the TX FSM */
+#ifndef ATMEGA8
 	TIMSK2 &= ~(1 << OCIE2A);
+#else
+	TIMSK &= ~(1 << OCIE2);
+#endif
 	memcpy((char *)radio->data, data, payload);
 	radio->payload = payload;
 	radio->state = START;
 	TCNT2 = 0;
+#ifndef ATMEGA8
 	TIMSK2 |= (1 << OCIE2A);
+#else
+	TIMSK |= (1 << OCIE2);
+#endif
 	
 	return ERR_OK;
 }
@@ -366,11 +415,19 @@ int radio433_rx(struct radio_data_s *radio, uint8_t *data, uint8_t *payload)
 		return ERR_NO_DATA;
 	
 	/* copy data to user buffer atomically and restart the RX FSM */
+#ifndef ATMEGA8
 	TIMSK2 &= ~(1 << OCIE2A);
+#else
+	TIMSK &= ~(1 << OCIE2);
+#endif
 	memcpy((char *)data, (char *)radio->data, radio->payload);
 	*payload = radio->payload;
 	radio->state = START;
+#ifndef ATMEGA8
 	TIMSK2 |= (1 << OCIE2A);
+#else
+	TIMSK |= (1 << OCIE2);
+#endif
 	
 	return ERR_OK;
 }
