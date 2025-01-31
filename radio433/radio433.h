@@ -4,9 +4,6 @@
 #define RX_PORT			PINC
 #define RX_DIR			DDRC
 #define RX_PIN			PC3
-#define ACT_PORT		PORTB
-#define ACT_DIR			DDRB
-#define ACT_PIN			PB5			// PB5 (uno) or PB7 (mega)
 
 #define ENCODE4B5B		1
 #define MAX_FRAME_SIZE		40			// 32 bytes for user data + 8 bytes for length, address, options, CRC...

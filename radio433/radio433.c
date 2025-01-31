@@ -43,11 +43,9 @@ ISR(TIMER2_COMP_vect){
 	if (radioptr->direction == TX) {
 		switch (radioptr->state) {
 		case READY:
-			ACT_PORT &= ~(1 << ACT_PIN);
 			break;
 		case START:
 			/* received a START signal, then start TX */
-			ACT_PORT |= (1 << ACT_PIN);
 			radioptr->state = STROBE;
 			radioptr->tbit = TSTROBE - 1;
 			break;
@@ -154,7 +152,6 @@ ISR(TIMER2_COMP_vect){
 			radioptr->state = READY;
 			radioptr->tbit = TSYNC - 1;
 		case READY:
-			ACT_PORT &= ~(1 << ACT_PIN);
 			/* wait for a sync pattern to start RX */
 			if (RX_PORT & (1 << RX_PIN)) {
 				if (radioptr->tbit == (TSYNC >> 1))
@@ -169,7 +166,6 @@ ISR(TIMER2_COMP_vect){
 			if (radioptr->tbit > 0) {
 				radioptr->tbit--;
 			} else {
-				ACT_PORT |= (1 << ACT_PIN);
 				radioptr->state = PAYLOAD;
 				radioptr->tbit = TBYTE - 1;
 			}
@@ -291,16 +287,13 @@ int radio433_setup(struct radio_data_s *radio, uint16_t baud, uint8_t direction)
 	if (baud < 100 || baud > 5000)
 		return ERR_CONFIG;
 	
-	/* setup TX, RX and ACT pins */
+	/* setup TX and RX pins */
 	TX_DIR |= (1 << TX_PIN);
 	TX_PORT &= ~(1 << TX_PIN);
 	
 	RX_DIR &= ~(1 << RX_PIN);
 	RX_PORT &= ~(1 << RX_PIN);
 
-	ACT_DIR |= (1 << ACT_PIN);
-	ACT_PORT &= ~(1 << ACT_PIN);
-	
 	cli();
 	
 	/* clear timer2 registers */
