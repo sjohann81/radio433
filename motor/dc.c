@@ -16,7 +16,9 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-void dc_init()
+/* init PWM for DC motor control
+ */
+void dc_init(uint8_t speed)
 {
 #ifdef ALT_DC_CONFIG
 	/* set timer 0 for phase correct PWM mode */
@@ -30,9 +32,51 @@ void dc_init()
 #else
 	/* configure timer1 for phase correct PWM mode with TOP value */
 	TCCR1A = (1 << WGM11);
-	/* prescaler is 1, PWM @ 500Hz */
-	TCCR1B = (1 << WGM13) | (1 << CS10);
-	ICR1 = 16000;
+
+	switch (speed) {
+	case PWM_25:
+		/* prescaler is 8 for PWM @ 25Hz, 50Hz, 100Hz or 250Hz */
+		TCCR1B = (1 << WGM13) | (1 << CS11);
+		ICR1 = PWM_25_MAX + 1;
+		break;
+	case PWM_50:
+		TCCR1B = (1 << WGM13) | (1 << CS11);
+		ICR1 = PWM_50_MAX + 1;
+		break;
+	case PWM_100:
+		TCCR1B = (1 << WGM13) | (1 << CS11);
+		ICR1 = PWM_100_MAX + 1;
+		break;
+	case PWM_250:
+		TCCR1B = (1 << WGM13) | (1 << CS11);
+		ICR1 = PWM_250_MAX + 1;
+		break;
+	case PWM_500:
+		/* prescaler is 1 for PWM >= 500Hz */
+		TCCR1B = (1 << WGM13) | (1 << CS10);
+		ICR1 = PWM_500_MAX + 1;
+		break;
+	case PWM_1k:
+		TCCR1B = (1 << WGM13) | (1 << CS10);
+		ICR1 = PWM_1k_MAX + 1;
+		break;
+	case PWM_2k5:
+		TCCR1B = (1 << WGM13) | (1 << CS10);
+		ICR1 = PWM_2k5_MAX + 1;
+		break;
+	case PWM_5k:
+		TCCR1B = (1 << WGM13) | (1 << CS10);
+		ICR1 = PWM_5k_MAX + 1;
+		break;
+	case PWM_10k:
+		TCCR1B = (1 << WGM13) | (1 << CS10);
+		ICR1 = PWM_10k_MAX + 1;
+		break;
+	case PWM_20k:
+		TCCR1B = (1 << WGM13) | (1 << CS10);
+		ICR1 = PWM_500_MAX + 1;
+		break;
+	}
 	
 	/* duty cycle: 0% */
 	OCR1A = 0;
