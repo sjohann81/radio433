@@ -47,13 +47,14 @@ ISR(TIMER0_OVF_vect)
 
 void servo0_init()
 {
+/* timer0 in normal mode, prescaler is 8 */
 #ifndef ATMEGA8
 	TCCR0A = 0;
-	TCCR0B = (1 << CS21);
+	TCCR0B = (1 << CS01);
 	TCNT0 = 0;
 	TIMSK0 = (1 << TOIE0);
 #else
-	TCCR0 = (1 << CS21);
+	TCCR0 = (1 << CS01);
 	TCNT0 = 0;
 	TIMSK = (1 << TOIE0);
 #endif
