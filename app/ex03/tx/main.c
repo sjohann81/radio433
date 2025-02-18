@@ -26,7 +26,7 @@ int main(void){
 
 	printf("ok\n");
 	
-	radio433_setup(&radiotx, 2000, TX);
+	radio433_setup(&radiotx, 1000, TX);
 	radio433_addr(&radiotx, 0x1234);
 	
 	memset(data, 0, sizeof(data));
@@ -43,7 +43,7 @@ int main(void){
 		/* send a control message */
 		radio433_send(&radiotx, 0x1234, data, sizeof(struct appdata_s));
 		
-		/* we are sending ~5 packets/s @ 2000bps*/
-		_delay_ms(200);
+		/* we are sending < 5 packets/s @ 1000bps*/
+		_delay_ms(300);
 	}
 }

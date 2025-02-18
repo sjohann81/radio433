@@ -29,7 +29,7 @@ int main(void){
 	
 	printf("ok\n");
 	
-	radio433_setup(&radiorx, 2000, RX);
+	radio433_setup(&radiorx, 1000, RX);
 	radio433_addr(&radiorx, 0x1234);
 	
 	while (1){
