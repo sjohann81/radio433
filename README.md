@@ -47,6 +47,7 @@ time) (or 6T + 6T).
   physical layer (air).
 
 STROBE (20T) - SYNC (10T) - PAYLOAD (10T) - DATA (10T for each word) - LEADOUT (10T) - raw encoding
+
 STROBE (24T) - SYNC (12T) - PAYLOAD (12T) - DATA (12T for each word) - LEADOUT (12T) - 4b5b encoding
 
 ## Protocol design
@@ -126,19 +127,20 @@ use a voltage regulator. Supply must be very close to 5v. I have
 powered the RX (XY-MK-5v) from el cheapo 5v adapters (measured voltage
 was 5.4v) and, although the sensibility of the receiver improved, one
 module died in a matter of days. If you want to power the RX from USB,
-measure the supply and ensure it's not more than 5v. Sometimes a 10k to
-100k resistor between GND and DATA pins (pull-down) improves noise
-rejection and frame detection.
+measure the supply and ensure it's not more than 5v. 
 
 TX:
 If you want more range, increase the TX module supply voltage. Most
 simple TX modules can be powered with anything between 5v to 12v. 9v
 to 12v is ideal. 12v may work best for longer range, but may fail if
 TX and RX are too close. TX must be at least 1m far from RX. If placed
-close, reduce supply voltage of the TX module.
+close, reduce supply voltage of the TX module to 3v to 5v.
 
-Use line filtering in the modules. Put something such as an 100n and a
-100uF cap close to the module.
+Use line filtering in the modules. Put something such as a 100uF cap
+close to the modules. Most modules work at 2000 baud or higher speeds,
+but some don't. A recent batch bought in 2024 only worked reliably at
+1000bps or less, but worked well. The problem seems to be on the RX
+side.
 
 
 ## API
