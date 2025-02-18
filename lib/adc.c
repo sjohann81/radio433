@@ -36,6 +36,7 @@ uint16_t adc_read()
 	while (!(ADCSRA & (1 << ADSC)));
 	/* reset ADC, conversion complete */
 	ADCSRA |= (1 << ADIF);
+	_delay_us(300);
 
 	return ADC;
 }
